@@ -6,11 +6,13 @@ def get_input():
     # Get input from user
     description = input("Enter description: ")
     icon = input("Enter icon: ")
-    coordinates = input("Enter coordinates (comma-separated): ").split(',')
-
-    # Convert coordinates to float
-    coordinates = [float(x.strip()) for x in coordinates]
-
+    while True:
+        try:
+            coordinates = input("Enter coordinates (comma-separated): ").split(',')
+            coordinates = [float(x.strip()) for x in coordinates]
+            break
+        except ValueError:
+            print("Invalid input. Please enter numbers separated by commas.")
     return description, icon, coordinates
 
 def main():
@@ -41,7 +43,7 @@ def main():
 
     # Commit and push changes
     repo = Repo(os.getcwd())
-    repo.git.pull('origin', 'master')  # Pull latest changes from remote repository
+    repo.git.pull('origin', 'main')  # Pull latest changes from remote repository
     repo.git.add('data.json')
     repo.git.commit('-m', 'Add new data')
     repo.git.push()
