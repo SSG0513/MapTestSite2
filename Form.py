@@ -14,8 +14,24 @@ def get_input():
         except ValueError:
             print("Invalid input. Please enter numbers separated by commas.")
     return description, icon, coordinates
+def hard_reset():
+    # Empty the content of data.json
+    with open('data.json', 'w') as f:
+        f.write('')
+
+    # Commit and push changes
+    repo = Repo(os.getcwd())
+    repo.git.pull('origin', 'master')  # Pull latest changes from remote repository
+    repo.git.add('data.json')
+    repo.git.commit('-m', 'Hard reset')
+    repo.git.push()
 
 def main():
+    action = input("Enter 'reset' to hard reset data.json, or anything else to proceed normally: ")
+
+    if action == 'reset':
+        hard_reset()
+    else:
     # Get input from user
     description, icon, coordinates = get_input()
 
