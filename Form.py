@@ -17,14 +17,15 @@ def get_input():
 def hard_reset():
     # Empty the content of data.json
     with open('data.json', 'w') as f:
-        f.write('')
+        json.dump({"type": "FeatureCollection", "features": []}, f)
 
     # Commit and push changes
     repo = Repo(os.getcwd())
-    repo.git.pull('origin', 'main')  # Pull latest changes from remote repository
+    repo.git.pull('origin', 'master')  # Pull latest changes from remote repository
     repo.git.add('data.json')
     repo.git.commit('-m', 'Hard reset')
     repo.git.push()
+
 
 def main():
     action = input("Enter 'reset' to hard reset data.json, or anything else to proceed normally: ")
