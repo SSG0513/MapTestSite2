@@ -1,4 +1,1 @@
-{
-    "type": "FeatureCollection",
-    "features": []
-}
+{"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"description": "First one", "icon": "bar-15"}, "geometry": {"type": "Point", "coordinates": [79.628405, 135.325761]}}]}
