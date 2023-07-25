@@ -24,11 +24,12 @@ body { margin: 0; padding: 0; }
         zoom: 11.15
     });
 
-    map.on('load', () => {
+		map.on('load', () => {
         map.addSource('places', {
             'type': 'geojson',
-            'data': 'data.json'
-					});
+            // append a unique timestamp to the URL
+            'data': `data.json?${new Date().getTime()}`
+        });
 
 
 
