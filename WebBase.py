@@ -5,21 +5,6 @@ from git import Repo
 
 app = Flask(__name__)
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        action = request.form.get('action')
-        if action == 'reset':
-            hard_reset()
-        else:
-            description = request.form.get('description')
-            icon = request.form.get('icon')
-            coordinates = request.form.get('coordinates').split(',')
-            coordinates = [float(x.strip()) for x in coordinates]
-            # proceed with your code
-            # ...
-
-    return render_template('index.html')
 def hard_reset():
     # Empty the content of data.json
     with open('data.json', 'w') as f:
@@ -27,49 +12,51 @@ def hard_reset():
 
     # Commit and push changes
     repo = Repo(os.getcwd())
-    repo.git.pull('origin', 'master')  # Pull latest changes from remote repository
+    repo.git.pull('origin', 'main')  # Pull latest changes from remote repository
     repo.git.add('data.json')
     repo.git.commit('-m', 'Hard reset')
     repo.git.push()
 
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        action = request.form.get('action')
+        if action == 'reset':
+            hard_reset()
+        else:
+            # フォームから送信されたデータを取得
+            description = request.form.get('description')
+            icon = request.form.get('icon')
+            coordinates = request.form.get('coordinates').split(',')
+            coordinates = [float(x.strip()) for x in coordinates]
 
-def main():
-    action = input("Enter 'reset' to hard reset data.json, or anything else to proceed normally: ")
+            # データを data.json に追加
+            with open('data.json', 'r+') as f:
+                data = json.load(f)
+                new_data = {
+                    'type': 'Feature',
+                    'properties': {
+                        'description': description,
+                        'icon': icon
+                    },
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': coordinates
+                    }
+                }
+                data['features'].append(new_data)
+                f.seek(0)  # ファイルの先頭に戻る
+                json.dump(data, f)
+                f.truncate()  # 余分な部分を削除
 
-    if action == 'reset':
-        hard_reset()
-    else:
-        # Get input from user
-        description, icon, coordinates = get_input()
+            # Commit and push changes
+            repo = Repo(os.getcwd())
+            repo.git.pull('origin', 'main')  # Pull latest changes from remote repository
+            repo.git.add('data.json')
+            repo.git.commit('-m', 'Add new data')
+            repo.git.push()
 
-        # Load existing data
-        with open('data.json', 'r') as f:
-            data = json.load(f)
-
-        # Add new data
-        new_data = {
-            'type': 'Feature',
-            'properties': {
-                'description': description,
-                'icon': icon
-            },
-            'geometry': {
-                'type': 'Point',
-                'coordinates': coordinates
-            }
-        }
-        data['features'].append(new_data)
-
-        # Save data
-        with open('data.json', 'w') as f:
-            json.dump(data, f)
-
-        # Commit and push changes
-        repo = Repo(os.getcwd())
-        repo.git.pull('origin', 'main')  # Pull latest changes from remote repository
-        repo.git.add('data.json')
-        repo.git.commit('-m', 'Add new data')
-        repo.git.push()
+    return render_template('index.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
