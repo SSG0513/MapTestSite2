@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+from werkzeug.utils import secure_filename
 import os
 import json
 from git import Repo
@@ -29,6 +30,10 @@ def index():
             icon = request.form.get('icon')
             coordinates = request.form.get('coordinates').split(',')
             coordinates = [float(x.strip()) for x in coordinates]
+            image = request.files.get('image')
+            if image:
+                filename = secure_filename(image.filename)
+                image.save(os.path.join('static/uploads', filename))
 
             # データを data.json に追加
             with open('data.json', 'r+') as f:
